@@ -1,7 +1,7 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/connection');
+import { DataTypes } from "sequelize";
+import { sequelize } from "@config/connection";
 
-const User = sequelize.define('user', {
+export const User = sequelize.define('user', {
     name: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -30,5 +30,3 @@ const User = sequelize.define('user', {
 //     delete values.password;
 //     return values;
 // }
-
-module.exports = User;
