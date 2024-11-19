@@ -15,7 +15,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     });
 
     if (!user) {
-      res.status(404).json({ message: "Usuario no encontrado" });
+      res.status(404).json({ message: "User not found" });
       return; 
     }
 
@@ -25,14 +25,14 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     // Comparación de la contraseña 
     // const isMatch = await bcrypt.compare(password, userData.password);
     // if (!isMatch) {
-    //   return res.status(401).json({ message: "Credenciales incorrectas" });
+    //   return res.status(401).json({ message: "Incorrect credentials" });
     // }
 
     
     const isMatch = password === userData.password; // Compara sin cifrado, solo por ejemplo
 
     if (!isMatch) {
-      res.status(401).json({ message: "Credenciales incorrectas" });
+      res.status(401).json({ message: "Incorrect credentials" });
       return; 
     }
 
@@ -41,7 +41,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     // Responder con el token y datos básicos del usuario
     res.status(200).json({
-      message: "Login exitoso",
+      message: "login successful",
       token,
       user: {
         id: userData.id,
