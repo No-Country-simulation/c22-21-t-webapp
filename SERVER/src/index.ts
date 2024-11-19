@@ -1,6 +1,7 @@
 import { app } from "./app";
 import { sequelize } from "@config/connection";
 import { envs } from "@config/envs";
+import "@models/initModels"
 
 const PORT = envs.PORT || 3000;
 
