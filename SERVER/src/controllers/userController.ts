@@ -1,7 +1,7 @@
 import { catchError } from "@middlewares/catchError";
 import { User } from "@models/User";
 
-import { updateUserProfile } from "src/services/UserServices";
+import { updateUserProfile } from "src/services/userServices";
 
 export const getAll = catchError(async (req, res) => {
   const users = await User.findAll();
