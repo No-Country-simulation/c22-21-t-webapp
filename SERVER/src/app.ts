@@ -1,22 +1,25 @@
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
-import { router } from "@routes/index"
+import { router } from "@routes/index";
 import { errorHandler } from "@middlewares/errorHandler";
+import "@config/cloudinary";
 
 export const app = express();
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }))
-app.use(helmet({
+app.use(express.urlencoded({ extended: true }));
+app.use(
+  helmet({
     crossOriginResourcePolicy: false,
-}));
+  })
+);
 app.use(cors());
 
-app.use('/api/v1', router);
+app.use("/api/v1", router);
 
-app.use(errorHandler)
+app.use(errorHandler);
 
-app.get('/', (_, res) => {
-    res.send("Welcome to Banki!");
+app.get("/", (_, res) => {
+  res.send("Welcome to Banki!");
 });
