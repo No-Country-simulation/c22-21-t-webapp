@@ -4,5 +4,5 @@ import { authRouter } from "./authRouter";
 
 export const router = express.Router();
 
-router.use(userRouter);
-router.use(authRouter);
+router.use("/user", userRouter);
+router.use("/auth", authRouter);
