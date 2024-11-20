@@ -1,7 +1,7 @@
 import { DataTypes, Model, Optional, Sequelize } from "sequelize";
-import { sequelize } from "@config/connection";
 
-interface UserAttributes {
+// Atributos del modelo User
+export interface UserAttributes {
   id: number;
   name: string;
   email: string;
@@ -9,11 +9,13 @@ interface UserAttributes {
   password: string;
   img: string;
   active:boolean;
+  role:string;
   updatedAt?: Date;
   createdAt?: Date;
 }
 
-export interface UserInput extends Optional<UserAttributes, "id" | "img"> {}
+// Define el tipo del objeto que se pasa a User.create()
+export interface UserInput extends Optional<UserAttributes, "id" | "img" | "role" | "active"> {}
 
 export class User extends Model<UserAttributes, UserInput> {
   static initModel(sequelize: Sequelize) {
@@ -47,7 +49,12 @@ export class User extends Model<UserAttributes, UserInput> {
         },
         active:{
           type: DataTypes.BOOLEAN,
-          defaultValue:true
+          defaultValue:true},
+
+        role: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          defaultValue: "cliente"
         }
       },
       {

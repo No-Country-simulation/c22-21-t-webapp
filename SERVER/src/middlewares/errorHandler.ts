@@ -1,3 +1,4 @@
+import { AppError } from "@utils/appError";
 import { NextFunction, Request, Response } from "express";
 
 interface ExtendedError extends Error {
@@ -7,7 +8,7 @@ interface ExtendedError extends Error {
 }
 
 type ErrorHandler = (
-  error: any,
+  error: ExtendedError,
   req: Request,
   res: Response,
   next: NextFunction
@@ -37,6 +38,10 @@ export const errorHandler: ErrorHandler = (
       message: error.message,
     });
   }
+  if (error instanceof AppError) {
+    return res.status(error.statusCode).json({ message: error.message });
+  }
+
   return res.status(500).json({
     message: error.message,
     error: error,

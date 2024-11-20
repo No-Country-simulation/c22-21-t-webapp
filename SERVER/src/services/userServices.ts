@@ -9,6 +9,7 @@ interface UserAttributes {
     password?: string; 
     img?: string;
     active: boolean;
+    role: string;
 }
 
 interface UserInstance extends Model<UserAttributes>, UserAttributes {}
