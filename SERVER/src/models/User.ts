@@ -8,6 +8,7 @@ interface UserAttributes {
   phone: string;
   password: string;
   img: string;
+  active:boolean;
   updatedAt?: Date;
   createdAt?: Date;
 }
@@ -44,6 +45,10 @@ export class User extends Model<UserAttributes, UserInput> {
           type: DataTypes.TEXT,
           allowNull: true,
         },
+        active:{
+          type: DataTypes.BOOLEAN,
+          defaultValue:true
+        }
       },
       {
         timestamps: true,

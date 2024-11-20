@@ -8,6 +8,7 @@ interface UserAttributes {
     phone: string;
     password?: string; 
     img?: string;
+    active: boolean;
 }
 
 interface UserInstance extends Model<UserAttributes>, UserAttributes {}
@@ -37,5 +38,23 @@ export const updateUserProfile = async (
 
     const userJson = updatedUser.toJSON();
     delete userJson.password;
+    return userJson;
+};
+
+//Delete a user logically
+export const deleteUserService = async (
+    userId: number
+): Promise<Omit<UserAttributes, 'password'>> => {
+    const user = await User.findByPk(userId) as UserInstance;
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    const updatedUser = await user.update({
+        active: false, 
+    });
+
+    const userJson = updatedUser.toJSON();
+    delete userJson.password; 
     return userJson;
 };
