@@ -1,7 +1,7 @@
 import { DataTypes, Model, Optional, Sequelize } from "sequelize";
-import { sequelize } from "@config/connection";
 
-interface UserAttributes {
+// Atributos del modelo User
+export interface UserAttributes {
   id: number;
   name: string;
   email: string;
@@ -12,6 +12,7 @@ interface UserAttributes {
   createdAt?: Date;
 }
 
+// Define el tipo del objeto que se pasa a User.create()
 export interface UserInput extends Optional<UserAttributes, "id" | "img"> {}
 
 export class User extends Model<UserAttributes, UserInput> {
