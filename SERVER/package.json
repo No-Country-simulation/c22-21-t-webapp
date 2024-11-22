@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "src/index.ts",
   "scripts": {
-    "build": "npx rimraf dist && npx tsc && npx tsc-alias",
-    "start": "npm install && npm run build && node dist/index.js",
-    "dev": "npx nodemon -r tsconfig-paths/register src/index.ts"
+    "build": "rimraf dist && tsc && tsc-alias",
+    "start": "node dist/index.js",
+    "dev": "nodemon -r tsconfig-paths/register src/index.ts"
   },
   "keywords": [],
   "author": "",
