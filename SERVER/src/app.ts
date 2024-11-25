@@ -65,13 +65,13 @@ app.use(cors({
 
 app.use("/api/v1", router);
 
+app.get("/", (_, res) => {
+  res.send("Welcome to Banki!");
+});
+
 // Middleware for undefined routes (404 handling)
 app.use((_, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
 app.use(errorHandler);
-
-app.get("/", (_, res) => {
-  res.send("Welcome to Banki!");
-});
