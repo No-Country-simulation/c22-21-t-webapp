@@ -51,23 +51,24 @@ const allowedOrigins = new Set(
 );
 //console.log("allowedOrigins: ", allowedOrigins)
 //Cors configuration
- app.use(cors({
-   origin: function(origin, callback) {
-     console.log('Request from origin:', origin);
-     // Allows requests without origin (mobile apps or curl)
-     if (!origin) return callback(null, true);
+app.use(cors({
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    if (!origin) return callback(null, true);
+    if (!allowedOrigins.has(origin)) {
+      const msg = `CORS policy does not allow access from the specified origin: ${origin}`;
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  }
+}));
 
-     if (!allowedOrigins.has(origin)) {
-       const msg = `CORS policy does not allow access from the specified origin: ${origin}`;
-       return callback(new Error(msg), false);
-     }
-     return callback(null, true);
-   },
-   methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
-   credentials: true
- }));
 
 app.use("/api/v1", router);
+
+// Middleware for undefined routes (404 handling)
+app.use((_, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
 
 app.use(errorHandler);
 
