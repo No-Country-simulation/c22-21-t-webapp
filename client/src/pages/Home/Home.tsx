@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import BackgroundComponent from "../../components/BackgroundComponent";
-import { SEO } from "../SEO/SEO";
+import { SEO } from "../../components/SEO/SEO";
 
 const Home = () => {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
@@ -23,7 +23,7 @@ const Home = () => {
             title="HOME | BANKI"
             description="Bienvenido a la página de inicio de nuestro sitio web. Aquí podrás encontrar información importante."
             keywords={["inicio", "bienvenida", "sitio web"]}
-            image="/assets/react.svg"
+            image="../assets/BANKIico.png"
             url="https://localhost:5173/home"
             type="website"
         />

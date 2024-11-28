@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { SEOVariables } from "./SEOVariables";
+import { SEOVariables } from "../types/SEOVariables";
   
 export function SEO({
     title,

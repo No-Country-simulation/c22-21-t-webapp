@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import bgMorning1 from "../assets/bg-image-1.webp";
 import bgMorning2 from "../assets/bg-image-2.webp";
+import bgMorning3 from "../assets/bg-image-7.webp";
 import bgAfternoon1 from "../assets/bg-image-3.webp";
 import bgAfternoon2 from "../assets/bg-image-4.webp";
+import bgAfternoon3 from "../assets/bg-image-8.webp";
 import bgEvening1 from "../assets/bg-image-5.webp";
 import bgEvening2 from "../assets/bg-image-6.webp";
 
 const backgrounds: { [key: string]: string[] } = {
-    morning: [bgMorning1, bgMorning2],
-    afternoon: [bgAfternoon1, bgAfternoon2],
+    morning: [bgMorning1, bgMorning2, bgMorning3],
+    afternoon: [bgAfternoon1, bgAfternoon2, bgAfternoon3],
     evening: [bgEvening1, bgEvening2],
 };
 
