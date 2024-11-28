@@ -23,7 +23,7 @@ const Home = () => {
             title="HOME | BANKI"
             description="Bienvenido a la página de inicio de nuestro sitio web. Aquí podrás encontrar información importante."
             keywords={["inicio", "bienvenida", "sitio web"]}
-            image="/assets/react.svg"
+            image="../assets/BANKIico.png"
             url="https://localhost:5173/home"
             type="website"
         />
