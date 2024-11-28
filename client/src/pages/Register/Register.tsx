@@ -9,6 +9,7 @@ import { RegisterCredentials } from "../../components/types/auth";
 import { FaExclamationCircle } from "react-icons/fa";
 import "../../App.css";
 import { SEO } from "../../components/SEO/SEO";
+import { API_Url } from "../../components/types/authAPI";
 
 const registerSchema = z
     .object({
@@ -46,12 +47,12 @@ const registerSchema = z
             )
             .regex(
                 /[a-z]/,
-                "La contraseñ debe contener al menos una letra minúscula"
+                "La contraseña debe contener al menos una letra minúscula"
             )
             .regex(/[0-9]/, "La contraseñ debe contener al menos un número")
             .regex(
                 /[@$!%*?&]/,
-                "La contraseñ debe contener al menos un caracter especial (@$!%*?&)"
+                "La contraseña debe contener al menos un caracter especial (@$!%*?&)"
             ),
         confirmPassword: z.string().min(1, "Por favor confirma tu contraseña"),
     })
@@ -73,19 +74,23 @@ const Register: React.FC = () => {
 
     const onSubmit = async (data: RegisterCredentials) => {
         try {
-            // TODO: Replace with API endpoint
-            const response = await fetch("/api/auth/register", {
+            const response = await fetch(`${API_Url}/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
+                body: JSON.stringify({
+                    email: data.email,
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                }),
             });
 
             if (!response.ok) throw new Error("El registro ha fallado");
 
-            toast.success(
-                "El registro ha sido exitoso! Por favor inicia sesión."
-            );
-            navigate("/login");
+            navigate('/verifyRegister', { 
+                state: { 
+                  initialData: data
+                } 
+              });
         } catch (error) {
             console.error(error);
             toast.error(

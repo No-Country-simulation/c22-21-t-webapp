@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound/NotFound";
 import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
+import VerifyRegister from "./pages/Register/VerifyRegister";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -15,6 +16,7 @@ const router = createBrowserRouter(
             <Route path="/" element={<App />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/verifyRegister" element={<VerifyRegister />} />
             <Route path="/home" element={<Home />} />
             {/* Ruta 404 */}
             <Route path="*" element={<NotFound />} />

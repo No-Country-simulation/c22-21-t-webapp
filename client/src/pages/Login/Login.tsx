@@ -1,6 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { string, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -8,6 +8,7 @@ import { AuthLayout } from "../../components/layouts/AuthLayout";
 import { LoginCredentials } from "../../components/types/auth";
 import { useAuthStore } from "../../components/store/authStore";
 import { SEO } from "../../components/SEO/SEO";
+import { API_Url } from "../../components/types/authAPI";
 
 const loginSchema = z.object({
     email: z.string().email("Correo Electrónico inválido"),
@@ -33,8 +34,7 @@ const Login: React.FC = () => {
 
     const onSubmit = async (data: LoginCredentials) => {
         try {
-            // TODO: Replace with API endpoint
-            const response = await fetch("/api/auth/login", {
+            const response = await fetch(`${API_Url}/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
