@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import BackgroundComponent from "../../components/BackgroundComponent";
-import { SEO } from "../SEO/SEO";
+import { SEO } from "../../components/SEO/SEO";
 
 const Home = () => {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
