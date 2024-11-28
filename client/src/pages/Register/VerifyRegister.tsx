@@ -49,13 +49,15 @@ const VerifyRegister: React.FC = () => {
         body: JSON.stringify(completeData),
       });
 
-      if (!response.ok) throw new Error('La verficación ha fallado');
+      if (!response.ok) throw new Error('La verificación ha fallado');
 
-      toast.success('Correo Electrónica verificado exitosamente');
-      navigate('/register/complete', { state: { initialData, verificationToken: data.verificationToken } });
+      toast.success('Correo Electrónico verificado exitosamente');
+      //navigate('/login', { state: { initialData, verificationToken: data.verificationToken } });
     } catch (error) {
       console.error(error);
       toast.error('La verificacion ha fallado. Por favor intenta nuevamente');
+    } finally {
+      navigate('/home');
     }
   };
 
@@ -87,7 +89,7 @@ const VerifyRegister: React.FC = () => {
                 touchedFields.verificationToken && errors.verificationToken ? 'is-invalid' : ''
               }`}
               {...register('verificationToken')}
-              placeholder="Enter 6-digit code"
+              placeholder="Ingresa el código de 6 dígitos"
             />
             {touchedFields.verificationToken && errors.verificationToken && (
               <div className="invalid-feedback">{errors.verificationToken.message}</div>
@@ -101,9 +103,9 @@ const VerifyRegister: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="btn btn-primary w-100 btn-sm"
+              className="btn btn-success w-100 btn-sm"
             >
-              {isSubmitting ? 'Verifying...' : 'Verify Email'}
+              {isSubmitting ? 'Verificando...' : 'Verificar Correo Electrónico'}
             </button>
           </div>
 

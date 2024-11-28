@@ -80,7 +80,7 @@ const Register: React.FC = () => {
                 body: JSON.stringify({
                     email: data.email,
                     firstName: data.firstName,
-                    lastName: data.lastName,
+                    // lastName: data.lastName,
                 }),
             });
 
