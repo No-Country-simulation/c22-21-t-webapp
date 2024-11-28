@@ -14,7 +14,7 @@ const loginSchema = z.object({
   rememberMe: z.boolean().default(false),
 });
 
-export const Login: React.FC = () => {
+const Login: React.FC = () => {
   const navigate = useNavigate();
   const setAuth = useAuthStore((state) => state.setAuth);
   const {
@@ -30,7 +30,7 @@ export const Login: React.FC = () => {
 
   const onSubmit = async (data: LoginCredentials) => {
     try {
-      // TODO: Replace with your API endpoint
+      // TODO: Replace with API endpoint
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -50,7 +50,7 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <AuthLayout title="Iniciar sesión en tu cuenta">
+    <AuthLayout title="Iniciar sesión">
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="mb-3">
           <label htmlFor="email" className="form-label">
@@ -97,17 +97,20 @@ export const Login: React.FC = () => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="btn btn-primary w-100 mb-3"
+          className="btn btn-success w-100 mb-3"
         >
           {isSubmitting ? 'Iniciando sesión...' : 'Iniciar sesión'}
         </button>
 
         <div className="text-center">
+          ¿No tienes una cuenta? <br />
           <Link to="/register" className="text-decoration-none">
-            No tienes una cuenta? Regístrate
+            Regístrate
           </Link>
         </div>
       </form>
     </AuthLayout>
   );
 };
+
+export default Login;
