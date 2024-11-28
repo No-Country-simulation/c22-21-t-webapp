@@ -212,6 +212,9 @@ const Home: React.FC = () => {
                         boxSizing: "border-box",
                     }}
                 >
+                    <div>
+                        <img src="\src\assets\BANKI-NEGRO 2.svg" alt="Logo" width={150}/>
+                    </div>
                     <div className="py-4">
                         <div className="row g-4">
                             {/* Header */}
