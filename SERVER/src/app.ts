@@ -7,6 +7,7 @@ import "@config/cloudinary";
 import session from 'express-session';
 import pgSession from "connect-pg-simple";
 import { Pool } from "pg";
+import accountRoutes from "./routes/accountRoutes"; // Importamos las rutas de cuentas bancarias
 
 export const app = express();
 
@@ -15,11 +16,9 @@ if (process.env.NODE_ENV !== 'production') {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
 
-
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
-
 
 app.use(
   session({
@@ -36,7 +35,6 @@ app.use(
   })
 );
 
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -45,12 +43,10 @@ app.use(
   })
 );
 
-// CORS configuration using environment variable
 const allowedOrigins = new Set(
   (process.env.ALLOWED_ORIGINS ?? '').split(',').map(origin => origin.trim())
 );
-//console.log("allowedOrigins: ", allowedOrigins)
-//Cors configuration
+
 app.use(cors({
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     if (!origin) return callback(null, true);
@@ -62,6 +58,8 @@ app.use(cors({
   }
 }));
 
+// Integrar las rutas de cuentas bancarias
+app.use("/api/v1/accounts", accountRoutes); // Ruta para las cuentas bancarias
 
 app.use("/api/v1", router);
 
@@ -69,7 +67,6 @@ app.get("/", (_, res) => {
   res.send("Welcome to Banki!");
 });
 
-// Middleware for undefined routes (404 handling)
 app.use((_, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
