@@ -3,21 +3,21 @@ import {
   registerAccountController, 
   validateAccountController, 
   getAccountBalanceController,
-  getTransactionHistoryController // Add this
+  getTransactionHistoryController 
 } from "../controllers/accountController";
 import { transferController } from "../controllers/transferController";
 
 const router = express.Router();
 
-// Existing routes
+
 router.post("/register", registerAccountController);
 router.post("/validate", validateAccountController);
 router.get("/:accountNumber/balance", getAccountBalanceController);
 
-// Remove verifyJWT middleware
-router.post("/transfer", transferController); // Quitar verifyJWT
 
-// Add new endpoint for transaction history
+router.post("/transfer", transferController); 
+
+
 router.get("/:accountNumber/transactions", getTransactionHistoryController);
 
 export default router;
