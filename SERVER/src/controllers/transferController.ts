@@ -5,7 +5,7 @@ import { catchError } from "@middlewares/catchError";
 export const transferController = catchError(async (req: Request, res: Response) => {
   const { fromAccountNumber, toAccountNumber, amount, description } = req.body;
 
-  // Validaciones más exhaustivas
+  
   if (!fromAccountNumber || !toAccountNumber || amount === undefined) {
     return res.status(400).json({
       status: 'error',

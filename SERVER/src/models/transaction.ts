@@ -2,8 +2,8 @@ import { DataTypes, Model, Optional, Sequelize } from "sequelize";
 
 export interface TransactionAttributes {
   id: number;
-  fromAccountId: number; // Change from string to number
-  toAccountId: number; // Change from string to number
+  fromAccountId: number; 
+  toAccountId: number;
   amount: number;
   type: 'TRANSFER' | 'DEPOSIT' | 'WITHDRAWAL';
   status: 'COMPLETED' | 'FAILED' | 'PENDING';
@@ -35,11 +35,11 @@ export class Transaction extends Model<TransactionAttributes, TransactionInput> 
           primaryKey: true,
         },
         fromAccountId: {
-          type: DataTypes.INTEGER, // Change from STRING to INTEGER
+          type: DataTypes.INTEGER, 
           allowNull: false,
         },
         toAccountId: {
-          type: DataTypes.INTEGER, // Change from STRING to INTEGER
+          type: DataTypes.INTEGER, 
           allowNull: false,
         },
         amount: {

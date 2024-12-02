@@ -18,7 +18,7 @@ export const transferFunds = async ({
 }: TransferParams) => {
   
   return await sequelize.transaction(async (t) => {
-    // Find source account
+   
     const sourceAccount = await Account.findOne({
       where: { accountNumber: fromAccountNumber, active: true },
       transaction: t,
@@ -29,7 +29,7 @@ export const transferFunds = async ({
       throw new AppError("Cuenta origen no encontrada o inactiva", 404);
     }
 
-    // Find destination account
+    
     const destinationAccount = await Account.findOne({
       where: { accountNumber: toAccountNumber, active: true },
       transaction: t,
@@ -40,7 +40,7 @@ export const transferFunds = async ({
       throw new AppError("Cuenta destino no encontrada o inactiva", 404);
     }
 
-    // Check sufficient funds
+   
     if (sourceAccount.balance < amount) {
       throw new AppError("Fondos insuficientes", 400);
     }
