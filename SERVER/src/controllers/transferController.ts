@@ -1,16 +1,42 @@
 import { Request, Response } from "express";
+import { transferFunds } from "../services/transferService";
 import { catchError } from "@middlewares/catchError";
-import { transferFunds } from "@services/transferService";
 
-export const createTransfer = catchError(async (req: Request, res: Response) => {
-  const { fromAccountId, toAccountNumber, amount } = req.body;
+export const transferController = catchError(async (req: Request, res: Response) => {
+  const { fromAccountNumber, toAccountNumber, amount, description } = req.body;
 
-  if (!fromAccountId || !toAccountNumber || !amount || amount <= 0) {
+  // Validaciones más exhaustivas
+  if (!fromAccountNumber || !toAccountNumber || amount === undefined) {
     return res.status(400).json({
-      error: "Invalid transfer parameters"
+      status: 'error',
+      message: 'Faltan datos requeridos para la transferencia'
     });
   }
 
-  const result = await transferFunds({ fromAccountId, toAccountNumber, amount });
-  return res.status(200).json(result);
+  if (typeof amount !== 'number' || amount <= 0) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'El monto debe ser un número positivo'
+    });
+  }
+
+  if (fromAccountNumber === toAccountNumber) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'No se puede transferir a la misma cuenta'
+    });
+  }
+
+  const result = await transferFunds({
+    fromAccountNumber,
+    toAccountNumber,
+    amount,
+    description
+  });
+
+  return res.status(200).json({
+    status: 'success',
+    message: 'Transferencia realizada con éxito',
+    data: result
+  });
 });

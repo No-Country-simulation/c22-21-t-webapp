@@ -4,54 +4,74 @@ import { sequelize } from "@config/connection";
 import { AppError } from "@utils/appError";
 
 interface TransferParams {
-  fromAccountId: number;
+  fromAccountNumber: string;
   toAccountNumber: string;
   amount: number;
+  description?: string;
 }
 
-export const transferFunds = async ({ fromAccountId, toAccountNumber, amount }: TransferParams) => {
-  const transaction = await sequelize.transaction();
-
-  try {
-    const sourceAccount = await Account.findByPk(fromAccountId, { transaction });
-    if (!sourceAccount || !sourceAccount.active) {
-      throw new AppError("Source account not found or inactive", 404);
-    }
-
-    const destAccount = await Account.findOne({ 
-      where: { accountNumber: toAccountNumber, active: true },
-      transaction 
+export const transferFunds = async ({
+  fromAccountNumber,
+  toAccountNumber,
+  amount,
+  description
+}: TransferParams) => {
+  
+  return await sequelize.transaction(async (t) => {
+    // Find source account
+    const sourceAccount = await Account.findOne({
+      where: { accountNumber: fromAccountNumber, active: true },
+      transaction: t,
+      lock: true
     });
-    if (!destAccount) {
-      throw new AppError("Destination account not found or inactive", 404);
+
+    if (!sourceAccount) {
+      throw new AppError("Cuenta origen no encontrada o inactiva", 404);
     }
 
-    const currentBalance = Number(sourceAccount.balance);
-    if (currentBalance < amount) {
-      throw new AppError("Insufficient funds", 400);
+    // Find destination account
+    const destinationAccount = await Account.findOne({
+      where: { accountNumber: toAccountNumber, active: true },
+      transaction: t,
+      lock: true
+    });
+
+    if (!destinationAccount) {
+      throw new AppError("Cuenta destino no encontrada o inactiva", 404);
     }
 
-    const transactionRecord = await Transaction.create({
-      fromAccountId: sourceAccount.id,
-      toAccountId: destAccount.id,
+    // Check sufficient funds
+    if (sourceAccount.balance < amount) {
+      throw new AppError("Fondos insuficientes", 400);
+    }
+
+    
+    const transaction = await Transaction.create({
+      fromAccountId: sourceAccount.id, 
+      toAccountId: destinationAccount.id, 
       amount,
-      status: 'pending'
-    }, { transaction });
+      type: 'TRANSFER',
+      status: 'PENDING',
+      description
+    }, { transaction: t });
 
-    await sourceAccount.decrement('balance', { by: amount, transaction });
-    await destAccount.increment('balance', { by: amount, transaction });
 
-    await transactionRecord.update({ status: 'completed' }, { transaction });
+    await sourceAccount.update({
+      balance: sourceAccount.balance - amount
+    }, { transaction: t });
 
-    await transaction.commit();
+    await destinationAccount.update({
+      balance: destinationAccount.balance + amount
+    }, { transaction: t });
+
+ 
+    await transaction.update({ status: 'COMPLETED' }, { transaction: t });
 
     return {
-      message: "Transfer completed successfully",
-      transactionId: transactionRecord.get('id')
+      transactionId: transaction.id,
+      status: 'COMPLETED',
+      sourceBalance: sourceAccount.balance - amount,
+      timestamp: new Date()
     };
-
-  } catch (error) {
-    await transaction.rollback();
-    throw error;
-  }
-}
+  });
+};

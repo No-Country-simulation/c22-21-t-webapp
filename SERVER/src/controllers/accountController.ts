@@ -1,5 +1,11 @@
 import { Request, Response } from "express";
-import { registerAccount, validateAccount, getAccountBalance } from "../services/accountService";
+import { catchError } from "@middlewares/catchError";
+import { 
+  registerAccount, 
+  validateAccount, 
+  getAccountBalance,
+  getTransactionHistory 
+} from "@services/accountService";
 
 export const registerAccountController = async (req: Request, res: Response) => {
   try {
@@ -54,3 +60,28 @@ export const getAccountBalanceController = async (req: Request, res: Response) =
     return res.status(400).json({ message: "Error desconocido." });
   }
 };
+
+export const getTransactionHistoryController = catchError(async (req: Request, res: Response) => {
+  const { accountNumber } = req.params;
+  const { 
+    startDate, 
+    endDate, 
+    type, 
+    page = 1, 
+    limit = 10 
+  } = req.query;
+
+  const transactions = await getTransactionHistory({
+    accountNumber,
+    startDate: startDate ? new Date(startDate as string) : undefined,
+    endDate: endDate ? new Date(endDate as string) : undefined,
+    type: type as 'TRANSFER' | 'DEPOSIT' | 'WITHDRAWAL' | undefined,
+    page: Number(page),
+    limit: Number(limit)
+  });
+
+  return res.status(200).json({
+    status: 'success',
+    data: transactions
+  });
+});

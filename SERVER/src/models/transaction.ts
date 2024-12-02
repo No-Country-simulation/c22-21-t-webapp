@@ -2,18 +2,32 @@ import { DataTypes, Model, Optional, Sequelize } from "sequelize";
 
 export interface TransactionAttributes {
   id: number;
-  fromAccountId: number;
-  toAccountId: number;
+  fromAccountId: number; // Change from string to number
+  toAccountId: number; // Change from string to number
   amount: number;
-  status: 'pending' | 'completed' | 'failed';
+  type: 'TRANSFER' | 'DEPOSIT' | 'WITHDRAWAL';
+  status: 'COMPLETED' | 'FAILED' | 'PENDING';
+  description?: string;
   createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface TransactionInput extends Optional<TransactionAttributes, "id"> {}
 
+
 export class Transaction extends Model<TransactionAttributes, TransactionInput> {
+  declare id: number; 
+  declare fromAccountId: string;
+  declare toAccountId: string;
+  declare amount: number;
+  declare type: 'TRANSFER' | 'DEPOSIT' | 'WITHDRAWAL';
+  declare status: 'COMPLETED' | 'FAILED' | 'PENDING';
+  declare description?: string;
+  declare readonly createdAt: Date;
+  declare readonly updatedAt: Date;
+
   static initModel(sequelize: Sequelize) {
-    this.init(
+    Transaction.init(
       {
         id: {
           type: DataTypes.INTEGER,
@@ -21,34 +35,46 @@ export class Transaction extends Model<TransactionAttributes, TransactionInput> 
           primaryKey: true,
         },
         fromAccountId: {
-          type: DataTypes.INTEGER,
+          type: DataTypes.INTEGER, // Change from STRING to INTEGER
           allowNull: false,
-          references: {
-            model: 'accounts',
-            key: 'id'
-          }
         },
         toAccountId: {
-          type: DataTypes.INTEGER,
+          type: DataTypes.INTEGER, // Change from STRING to INTEGER
           allowNull: false,
-          references: {
-            model: 'accounts',
-            key: 'id'
-          }
         },
         amount: {
           type: DataTypes.DECIMAL(10, 2),
-          allowNull: false
+          allowNull: false,
+        },
+        type: {
+          type: DataTypes.ENUM('TRANSFER', 'DEPOSIT', 'WITHDRAWAL'),
+          allowNull: false,
         },
         status: {
-          type: DataTypes.ENUM('pending', 'completed', 'failed'),
-          defaultValue: 'pending'
+          type: DataTypes.ENUM('COMPLETED', 'FAILED', 'PENDING'),
+          allowNull: false,
+        },
+        description: {
+          type: DataTypes.STRING,
+          allowNull: true,
         }
       },
       {
         sequelize,
-        tableName: 'transactions'
+        tableName: "transactions"
       }
     );
+  }
+
+  static associate(models: any) {
+    Transaction.belongsTo(models.Account, {
+      foreignKey: 'fromAccountId',
+      as: 'sourceAccount'
+    });
+    
+    Transaction.belongsTo(models.Account, {
+      foreignKey: 'toAccountId',
+      as: 'destinationAccount'
+    });
   }
 }
