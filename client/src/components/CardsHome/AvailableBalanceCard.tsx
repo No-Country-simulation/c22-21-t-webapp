@@ -6,10 +6,11 @@ const AvailableBalanceCard: React.FC<{ accountNumber: number }> = ({ accountNumb
     useEffect(() => {
         const fetchBalance = async () => {
             try {
-                const response = await fetch(`https://banki-backend.onrender.com/api/v1/${accountNumber}/balance`);
+                const response = await fetch(`aquivaellinksegunmiser`);
                 if (!response.ok) throw new Error("Error al obtener el balance.");
                 const data = await response.json();
                 setBalance(data.balance);
+                console.log("Saldo obtenido:", data.balance);
             } catch (error) {
                 console.error(error);
             }
