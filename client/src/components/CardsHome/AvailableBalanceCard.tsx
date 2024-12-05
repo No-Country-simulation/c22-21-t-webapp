@@ -1,23 +1,30 @@
-// import React from "react";
+import React, { useEffect, useState } from "react";
 
-// const AvailableBalanceCard: React.FC = () => (
-//     <div className="bg-success p-2 rounded-4" style={{width: "100%", height: "10rem" }}>
-//         <h2 className="fs-4 bold text-start">Saldo disponible</h2>
-//         <p className="fs-1 text-center text-light">$0</p>
-//         <p className="fs-5 text-dark text-center">Caja ahorro en pesos</p>
-//     </div>
-// );
+const AvailableBalanceCard: React.FC<{ accountNumber: number }> = ({ accountNumber }) => {
+    const [balance, setBalance] = useState<number | null>(null);
 
-// export default AvailableBalanceCard;
+    useEffect(() => {
+        const fetchBalance = async () => {
+            try {
+                const response = await fetch(`https://banki-backend.onrender.com/api/v1/${accountNumber}/balance`);
+                if (!response.ok) throw new Error("Error al obtener el balance.");
+                const data = await response.json();
+                setBalance(data.balance);
+            } catch (error) {
+                console.error(error);
+            }
+        };
 
-import React from "react";
+        fetchBalance();
+    }, [accountNumber]);
 
-const AvailableBalanceCard: React.FC = () => (
-    <div className="bg-success text-white p-3 rounded-3 h-100">
-        <h2 className="fs-5 fw-bold">Saldo disponible</h2>
-        <p className="fs-2 text-center">$13.506,65</p>
-        <p className="fs-6 text-center">Caja ahorro en pesos</p>
-    </div>
-);
+    return (
+        <div className="bg-success text-white p-3 rounded-4 h-100">
+            <h2 className="fs-5 fw-bold">Saldo disponible</h2>
+            <p className="fs-2 text-center">{balance !== null ? `$${balance}` : "Cargando..."}</p>
+            <p className="fs-6 text-center">Caja ahorro en pesos</p>
+        </div>
+    );
+};
 
 export default AvailableBalanceCard;
