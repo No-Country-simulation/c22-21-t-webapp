@@ -59,12 +59,12 @@ export const transferFunds = async ({
 
     
     if(isSuspicious){
-      console.log("Usuario: ",sourceAccount?.dataValues.userId)
+
       const userId= sourceAccount?.dataValues.userId
       const user = await User.findOne({
         where: { id:userId}
       })
-      console.log("Usuario:", user)
+     
       const email= user?.dataValues.email;
       const name= user?.dataValues.name
       const transactionDate= new Date();
