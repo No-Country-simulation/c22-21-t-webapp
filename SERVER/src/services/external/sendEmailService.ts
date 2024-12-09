@@ -8,6 +8,13 @@ interface messageAttributes {
   token: string;
 }
 
+interface messagesuspiciousAttributes {
+  name: string;
+  email: string;
+  transactionDate: Date,
+  amount: Number
+}
+
 // Inicializar conexión con el servicio SMTP
 const transporter = nodemailer.createTransport({
   host: envs.SMTP_HOST,
@@ -49,5 +56,47 @@ export const sendOTPtoEmail = async ({
         </body>
     </html>
     `,
+  });
+};
+
+
+
+export const sendSuspiciousToEmail = async ({
+  name,
+  email,
+  transactionDate,
+  amount,
+}: messagesuspiciousAttributes) => {
+  // Formar y enviar mensaje
+
+  const fromEmail = "noreply.bankiapp@gmail.com";
+  const _ = await transporter.sendMail({
+    from: fromEmail,
+    to: email,
+    subject: "[Banki] Verificación de cuenta",
+    html: `
+    <html>
+        <body>
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 8px;">
+                <h2 style="color: #d9534f;">¡Alerta de seguridad!</h2>
+                <p>Estimado/a ${name},</p>
+                <p>Hemos detectado una actividad sospechosa en tu cuenta de Banki. Por favor, revisa las siguientes transacciones recientes:</p>
+                <ul>
+                    <li><strong>Fecha:</strong> ${transactionDate}</li>
+                    <li><strong>Monto:</strong> ${amount}</li>
+                </ul>
+                <p>Si reconoces esta actividad, no es necesario que tomes ninguna acción. Sin embargo, si no autorizaste esta transacción, te recomendamos que sigas los siguientes pasos de inmediato:</p>
+                <ol>
+                    <li>Inicia sesión en tu cuenta de Banki y revisa tu historial de transacciones.</li>
+                    <li>Si confirmas que es una transacción no autorizada, cambia tu contraseña y contacta a nuestro equipo de soporte.</li>
+                </ol>
+                <p>La seguridad de tu cuenta es nuestra prioridad. Si necesitas ayuda adicional, contáctanos a través de nuestra línea de soporte o envíanos un correo electrónico.</p>
+                <footer style="margin-top: 20px; font-size: 12px; color: gray; text-align: center;">
+                    <p>Saludos,<br>El equipo de Banki</p>
+                </footer>
+            </div>
+        </body>
+    </html>
+`,
   });
 };

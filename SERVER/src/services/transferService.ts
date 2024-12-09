@@ -1,8 +1,10 @@
 import { Account } from "@models/account";
 import { Transaction } from "@models/transaction";
+import {User} from "@models/User"
 import { sequelize } from "@config/connection";
 import { AppError } from "@utils/appError";
 import { Op } from "sequelize";
+import { sendSuspiciousToEmail } from "./external/sendEmailService";
 
 interface TransferParams {
   fromAccountNumber: string;
@@ -25,7 +27,6 @@ export const transferFunds = async ({
 }: TransferParams) => {
   
   return await sequelize.transaction(async (t) => {
-   
     const sourceAccount = await Account.findOne({
       where: { accountNumber: fromAccountNumber, active: true },
       transaction: t,
@@ -51,10 +52,25 @@ export const transferFunds = async ({
 
     const isSuspicious = await checkSuspiciousTransaction({
       accountId: sourceAccount.id,
-      amountThreshold: 10000, // X monto límite
+      amountThreshold: 1000000, // X monto límite
       transactionLimit: 5,   // Y número de transacciones
       timeWindowInHours: 1,  // Z tiempo en horas
     });
+
+    
+    if(isSuspicious){
+      console.log("Usuario: ",sourceAccount?.dataValues.userId)
+      const userId= sourceAccount?.dataValues.userId
+      const user = await User.findOne({
+        where: { id:userId}
+      })
+      console.log("Usuario:", user)
+      const email= user?.dataValues.email;
+      const name= user?.dataValues.name
+      const transactionDate= new Date();
+      if( email && name)
+      await sendSuspiciousToEmail({ email, name,transactionDate, amount });
+    }
 
     const transaction = await Transaction.create({
       fromAccountId: sourceAccount.id, 
