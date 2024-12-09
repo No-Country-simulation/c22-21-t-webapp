@@ -25,85 +25,109 @@ export const transferFunds = async ({
   amount,
   description
 }: TransferParams) => {
-  
-  return await sequelize.transaction(async (t) => {
-    const sourceAccount = await Account.findOne({
-      where: { accountNumber: fromAccountNumber, active: true },
-      transaction: t,
-      lock: true
-    });
-
-    if (!sourceAccount) {
-      throw new AppError("Cuenta origen no encontrada o inactiva", 404);
-    }
-
+  try {
+    return await sequelize.transaction(async (t) => {
+   
+      const preciseAmount = Number(amount.toFixed(2));
+      
     
-    const destinationAccount = await Account.findOne({
-      where: { accountNumber: toAccountNumber, active: true },
-      transaction: t,
-      lock: true
-    });
-    if (!destinationAccount) {
-      throw new AppError("Cuenta destino no encontrada o inactiva", 404);
-    }
-    if (sourceAccount.balance < amount) {
-      throw new AppError("Fondos insuficientes", 400);
-    }
+      if (preciseAmount <= 0) {
+        throw new AppError("El monto debe ser mayor a 0", 400);
+      }
 
-    const isSuspicious = await checkSuspiciousTransaction({
-      accountId: sourceAccount.id,
-      amountThreshold: 1000000, // X monto límite
-      transactionLimit: 5,   // Y número de transacciones
-      timeWindowInHours: 1,  // Z tiempo en horas
-    });
+      const sourceAccount = await Account.findOne({
+        where: { accountNumber: fromAccountNumber, active: true },
+        transaction: t,
+        lock: true
+      });
 
-    
-    if(isSuspicious){
+      if (!sourceAccount) {
+        throw new AppError("Cuenta origen no encontrada o inactiva", 404);
+      }
 
-      const userId= sourceAccount?.dataValues.userId
-      const user = await User.findOne({
-        where: { id:userId}
-      })
+      const destinationAccount = await Account.findOne({
+        where: { accountNumber: toAccountNumber, active: true },
+        transaction: t,
+        lock: true
+      });
+
+      if (!destinationAccount) {
+        throw new AppError("Cuenta destino no encontrada o inactiva", 404);
+      }
+
+      if (sourceAccount.balance < preciseAmount) {
+        throw new AppError("Fondos insuficientes", 400);
+      }
+
+      const isSuspicious = await checkSuspiciousTransaction({
+        accountId: sourceAccount.id,
+        amountThreshold: 1000000,
+        transactionLimit: 5,
+        timeWindowInHours: 1,
+      });
+
+      if(isSuspicious){
+        const userId = sourceAccount?.dataValues.userId
+        const user = await User.findOne({
+          where: { id:userId}
+        });
+        
+        const email = user?.dataValues.email;
+        const name = user?.dataValues.name;
+        const transactionDate = new Date();
+        if(email && name) {
+          await sendSuspiciousToEmail({ email, name, transactionDate, amount });
+        }
+      }
+
      
-      const email= user?.dataValues.email;
-      const name= user?.dataValues.name
-      const transactionDate= new Date();
-      if( email && name)
-      await sendSuspiciousToEmail({ email, name,transactionDate, amount });
-    }
+      console.log('Balance inicial origen:', sourceAccount.balance);
+      console.log('Balance inicial destino:', destinationAccount.balance);
+      console.log('Monto a transferir:', preciseAmount);
 
-    const transaction = await Transaction.create({
-      fromAccountId: sourceAccount.id, 
-      toAccountId: destinationAccount.id, 
-      amount,
-      type: 'TRANSFER',
-      status: 'PENDING',
-      description,
-      suspicious:isSuspicious
-    }, { transaction: t });
-    await sourceAccount.update({
-      balance: sourceAccount.balance - amount
-    }, { transaction: t });
+      const transaction = await Transaction.create({
+        fromAccountId: sourceAccount.id,
+        toAccountId: destinationAccount.id,
+        amount: preciseAmount,
+        type: 'TRANSFER',
+        status: 'PENDING',
+        description,
+        suspicious: isSuspicious
+      }, { transaction: t });
 
-    await destinationAccount.update({
-      balance: destinationAccount.balance + amount
-    }, { transaction: t });
+      await sourceAccount.update({
+        balance: sequelize.literal(`balance - ${preciseAmount}`)
+      }, { transaction: t });
 
- 
-    await transaction.update({ status: 'COMPLETED' }, { transaction: t });
+      await destinationAccount.update({
+        balance: sequelize.literal(`balance + ${preciseAmount}`)
+      }, { transaction: t });
 
-    return {
-      transactionId: transaction.id,
-      status: 'COMPLETED',
-      suspicious: isSuspicious,
-      sourceBalance: sourceAccount.balance - amount,
-      timestamp: new Date()
-    };
-  });
+      
+      await sourceAccount.reload();
+      await destinationAccount.reload();
 
+      console.log('Balance final origen:', sourceAccount.balance);
+      console.log('Balance final destino:', destinationAccount.balance);
 
+      await transaction.update({ status: 'COMPLETED' }, { transaction: t });
 
-  
+     
+      console.log(`Transfer ${transaction.id} completed: ${preciseAmount} from ${fromAccountNumber} to ${toAccountNumber}`);
+
+      return {
+        transactionId: transaction.id,
+        status: 'COMPLETED',
+        suspicious: isSuspicious,
+        sourceBalance: sourceAccount.balance,
+        destinationBalance: destinationAccount.balance, 
+        timestamp: new Date()
+      };
+    });
+  } catch (error) {
+    console.error('Transfer failed:', error);
+    throw error;
+  }
 };
 
 export const checkSuspiciousTransaction = async ({
