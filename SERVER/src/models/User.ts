@@ -14,7 +14,6 @@ export interface UserAttributes {
   createdAt?: Date;
 }
 
-// Define el tipo del objeto que se pasa a User.create()
 export interface UserInput extends Optional<UserAttributes, "id" | "img" | "role" | "active"> {}
 
 export class User extends Model<UserAttributes, UserInput> {
