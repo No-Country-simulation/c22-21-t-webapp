@@ -7,7 +7,7 @@ import {
   getTransactionHistory 
 } from "@services/accountService";
 
-export const registerAccountController = async (req: Request, res: Response) => {
+export const  registerAccountController = async (req: Request, res: Response) => {
   try {
     const { accountNumber, userId, balance } = req.body;
 
