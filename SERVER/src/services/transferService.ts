@@ -74,16 +74,22 @@ export const transferFunds = async ({
         
         const email = user?.dataValues.email;
         const name = user?.dataValues.name;
-        const transactionDate = new Date();
+        const date= new Date();
+        const transactionDate = new Intl.DateTimeFormat('es-ES', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false,
+        }).format(date);
         if(email && name) {
           await sendSuspiciousToEmail({ email, name, transactionDate, amount });
         }
       }
 
-     
-      console.log('Balance inicial origen:', sourceAccount.balance);
-      console.log('Balance inicial destino:', destinationAccount.balance);
-      console.log('Monto a transferir:', preciseAmount);
+
 
       const transaction = await Transaction.create({
         fromAccountId: sourceAccount.id,
@@ -107,13 +113,10 @@ export const transferFunds = async ({
       await sourceAccount.reload();
       await destinationAccount.reload();
 
-      console.log('Balance final origen:', sourceAccount.balance);
-      console.log('Balance final destino:', destinationAccount.balance);
+
 
       await transaction.update({ status: 'COMPLETED' }, { transaction: t });
 
-     
-      console.log(`Transfer ${transaction.id} completed: ${preciseAmount} from ${fromAccountNumber} to ${toAccountNumber}`);
 
       return {
         transactionId: transaction.id,

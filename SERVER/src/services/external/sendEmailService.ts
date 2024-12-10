@@ -11,7 +11,7 @@ interface messageAttributes {
 interface messagesuspiciousAttributes {
   name: string;
   email: string;
-  transactionDate: Date,
+  transactionDate: string,
   amount: Number
 }
 
@@ -73,7 +73,7 @@ export const sendSuspiciousToEmail = async ({
   const _ = await transporter.sendMail({
     from: fromEmail,
     to: email,
-    subject: "[Banki] Verificación de cuenta",
+    subject: "[Banki] Transacción sospechosa",
     html: `
     <html>
         <body>
