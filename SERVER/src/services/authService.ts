@@ -116,7 +116,7 @@ export const loginService = async (email: string, password: string): Promise<Log
   const userData = user.get();
 
   // Comparar contraseñas (esto debe usar bcrypt en producción)
-  const isMatch = bcrypt.compare(password, userData.password); // Usa bcrypt.compare(password, userData.password) en producción
+  const isMatch = bcrypt.compareSync(password, userData.password); // Usa bcrypt.compare(password, userData.password) en producción
   if (!isMatch) {
     throw new Error("Incorrect credentials");
   }
