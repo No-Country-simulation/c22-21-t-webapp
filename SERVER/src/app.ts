@@ -7,11 +7,11 @@ import "@config/cloudinary";
 import session from 'express-session';
 import pgSession from "connect-pg-simple";
 import { Pool } from "pg";
-import accountRoutes from "./routes/accountRoutes"; // Importamos las rutas de cuentas bancarias
+import accountRoutes from "./routes/accountRoutes";
 
 export const app = express();
 
-// Disable TLS verification in development environment only
+
 if (process.env.NODE_ENV !== 'production') {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
@@ -58,8 +58,8 @@ app.use(cors({
   }
 }));
 
-// Integrar las rutas de cuentas bancarias
-app.use("/api/v1/accounts", accountRoutes); // Ruta para las cuentas bancarias
+
+app.use("/api/v1/accounts", accountRoutes); 
 
 app.use("/api/v1", router);
 
