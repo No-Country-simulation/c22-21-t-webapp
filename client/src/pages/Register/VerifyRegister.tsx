@@ -5,7 +5,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { AuthLayout } from '../../components/layouts/AuthLayout';
+import { useAuthStore } from '../../components/store/authStore';
+import { VerificationData } from '../../components/types/auth';
 import { API_Url } from '../../components/types/authAPI';
+
+interface LocationState {
+  email: string;
+  name: string;
+  password: string;
+  phone: string;
+}
 
 const verifyTokenSchema = z.object({
   verificationToken: z
@@ -19,7 +28,8 @@ type VerifyTokenForm = z.infer<typeof verifyTokenSchema>;
 const VerifyRegister: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const initialData = location.state?.initialData;
+  const setAuth = useAuthStore((state) => state.setAuth);
+  const state = location.state as LocationState | undefined;
 
   const {
     register,
@@ -32,39 +42,44 @@ const VerifyRegister: React.FC = () => {
 
   const onSubmit = async (data: VerifyTokenForm) => {
     try {
-      if (!initialData) {
-        toast.error('Datos del registro no encontrados');
+      if (!state?.email) {
+        toast.error('Correo no encontrado');
         navigate('/register');
         return;
       }
 
-      const completeData = {
-        ...initialData,
-        verificationToken: data.verificationToken,
+      const verificationData: VerificationData = {
+        token: data.verificationToken,
+        user: {
+          name: state.name,
+          email: state.email,
+          password: state.password,
+          phone: state.phone,
+        },
       };
 
-      const response = await fetch(`${API_Url}/verifyRegister`, {
+      const response = await fetch(`${API_Url}/auth/verifyRegister`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(completeData),
+        body: JSON.stringify(verificationData),
       });
 
-      if (!response.ok) throw new Error('La verificación ha fallado');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'La verificacion ha fallado');
+      }
 
-      toast.success('Correo Electrónico verificado exitosamente');
-      //navigate('/login', { state: { initialData, verificationToken: data.verificationToken } });
-    } catch (error) {
-      console.error(error);
-      toast.error('La verificacion ha fallado. Por favor intenta nuevamente');
-    } finally {
+      const { user, token } = await response.json();
+
+      setAuth(user, token, false);
+      toast.success('Cuenta creada satisfactoriamente!');
       navigate('/home');
+    } catch (error) {
+      console.log(error);
+      const message = error instanceof Error ? error.message : 'La verificacion ha fallado. Por favor intenta nuevamente';
+      toast.error(message);
     }
   };
-
-  if (!initialData) {
-    navigate('/register');
-    return null;
-  }
 
   return (
     <AuthLayout title="Verifica tu correo electrónico">
@@ -73,7 +88,7 @@ const VerifyRegister: React.FC = () => {
           <div className="col-12">
             <div className="text-center mb-3">
               <p className="mb-1">Hemos enviado un correo electrónico a</p>
-              <p className="fw-bold mb-0">{initialData.email}</p>
+              <p className="fw-bold mb-0">{state && state.email}</p>
             </div>
           </div>
 

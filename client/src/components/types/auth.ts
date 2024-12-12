@@ -1,10 +1,10 @@
 export interface User {
-    id: string;
-    firstName: string;
-    lastName: string;
-    dni: string;
+    id: number;
+    name: string;
     email: string;
-  }
+    role: string;
+    img: string | null;
+}
   
   export interface LoginCredentials {
     email: string;
@@ -15,8 +15,18 @@ export interface User {
   export interface RegisterCredentials {
     firstName: string;
     lastName: string;
-    dni: string;
+    phone: string;
     email: string;
     password: string;
     confirmPassword: string;
+  }
+
+  export interface VerificationData {
+    token: string;
+    user: {
+      name: string;
+      email: string;
+      password: string;
+      phone: string;
+    };
   }

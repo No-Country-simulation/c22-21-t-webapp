@@ -31,12 +31,12 @@ const registerSchema = z
             .string()
             .min(1, "El correo electrónico es obligatorio")
             .email("Por favor ingresa un correo electrónico válido"),
-        dni: z
+        phone: z
             .string()
-            .min(1, "El DNI es obligatorio")
-            .min(8, "El DNI debe tener al menos 8 caracteres")
-            .max(10, "El DNI no puede exceder los 10 caracteres")
-            .regex(/^\d+$/, "El DNI solo debe contener números"),
+            .min(1, "El telefono es obligatorio")
+            .min(8, "El telefono debe tener al menos 8 caracteres")
+            .max(10, "El telefono no puede exceder los 10 caracteres")
+            .regex(/^\d+$/, "El telefono solo debe contener números"),
         password: z
             .string()
             .min(1, "La contraseña es obligatoria")
@@ -74,21 +74,25 @@ const Register: React.FC = () => {
 
     const onSubmit = async (data: RegisterCredentials) => {
         try {
-            const response = await fetch(`${API_Url}/register`, {
+            const response = await fetch(`${API_Url}/auth/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
+                    name: data.firstName + " " + data.lastName,
                     email: data.email,
-                    firstName: data.firstName,
-                    // lastName: data.lastName,
+                    //phone: data.phone,
+                    //password: data.password,
                 }),
             });
 
             if (!response.ok) throw new Error("El registro ha fallado");
 
             navigate('/verifyRegister', { 
-                state: { 
-                  initialData: data
+                state: {
+                  name:data.firstName + " " + data.lastName,   
+                  email:data.email,
+                  password:data.password,
+                  phone:data.phone,
                 } 
               });
         } catch (error) {
@@ -166,23 +170,23 @@ const Register: React.FC = () => {
                     </div>
 
                     <div className="col-12">
-                        <label htmlFor="dni" className="form-label small mb-1">
-                            DNI <span className="text-danger">*</span>
+                        <label htmlFor="phone" className="form-label small mb-1">
+                            Número de telefono <span className="text-danger">*</span>
                         </label>
                         <input
-                            id="dni"
+                            id="phone"
                             type="text"
                             className={`form-control form-control-sm ${
-                                touchedFields.dni && errors.dni
+                                touchedFields.phone && errors.phone
                                     ? "is-invalid"
                                     : ""
                             }`}
-                            {...register("dni")}
-                            placeholder="Ingresa tu DNI"
+                            {...register("phone")}
+                            placeholder="Ingresa el número de telefono"
                         />
-                        {touchedFields.dni && errors.dni && (
+                        {touchedFields.phone && errors.phone && (
                             <div className="invalid-feedback small">
-                                {errors.dni.message}
+                                {errors.phone.message}
                             </div>
                         )}
                     </div>
