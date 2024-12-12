@@ -46,12 +46,12 @@ const registerSchema = z
             )
             .regex(
                 /[a-z]/,
-                "La contraseñ debe contener al menos una letra minúscula"
+                "La contraseña debe contener al menos una letra minúscula"
             )
-            .regex(/[0-9]/, "La contraseñ debe contener al menos un número")
+            .regex(/[0-9]/, "La contraseña debe contener al menos un número")
             .regex(
                 /[@$!%*?&]/,
-                "La contraseñ debe contener al menos un caracter especial (@$!%*?&)"
+                "La contraseña debe contener al menos un caracter especial (@$!%*?&)"
             ),
         confirmPassword: z.string().min(1, "Por favor confirma tu contraseña"),
     })
