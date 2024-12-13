@@ -61,7 +61,7 @@ export const transferFunds = async ({
 
       const isSuspicious = await checkSuspiciousTransaction({
         accountId: sourceAccount.id,
-        amountThreshold: 1000000,
+        amountThreshold: 99999,
         transactionLimit: 5,
         timeWindowInHours: 1,
       });
