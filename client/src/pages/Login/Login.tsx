@@ -1,6 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { string, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -8,6 +8,7 @@ import { AuthLayout } from "../../components/layouts/AuthLayout";
 import { LoginCredentials } from "../../components/types/auth";
 import { useAuthStore } from "../../components/store/authStore";
 import { SEO } from "../../components/SEO/SEO";
+import { API_Url } from "../../components/types/authAPI";
 
 const loginSchema = z.object({
     email: z.string().email("Correo Electrónico inválido"),
@@ -23,7 +24,9 @@ const Login: React.FC = () => {
     const {
         register,
         handleSubmit,
+        setError,
         formState: { errors, isSubmitting },
+        clearErrors,
     } = useForm<LoginCredentials>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
@@ -33,24 +36,33 @@ const Login: React.FC = () => {
 
     const onSubmit = async (data: LoginCredentials) => {
         try {
-            // TODO: Replace with API endpoint
-            const response = await fetch("/api/auth/login", {
+            clearErrors();
+            const response = await fetch(`${API_Url}/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
             });
 
-            if (!response.ok) throw new Error("Inicio de sesión ha fallado");
+            const responseData = await response.json();
 
-            const { user, token } = await response.json();
+            if (!response.ok) {
+                if (responseData.message === 'Incorrect credentials') {
+                    setError('password', { 
+                        type: 'manual',
+                        message: 'Correo electrónico o contraseña incorrectos'
+                      });
+                      return;
+                    }
+                    throw new Error(responseData.message || 'Login failed');
+            }
+
+            const { user, token } = responseData;
             setAuth(user, token, data.rememberMe);
             toast.success("Inicio de sesión exitoso!");
-            navigate("/dashboard");
+            navigate("/home");
         } catch (error) {
-            console.error(error);
-            toast.error(
-                "Inicio de sesión ha fallado. Por favor intenta nuevamente."
-            );
+            const message = error instanceof Error ? error.message : 'Login failed';
+            toast.error(message);
         }
     };
 
@@ -65,7 +77,7 @@ const Login: React.FC = () => {
                 type="website"
             />
             <AuthLayout title="Iniciar sesión">
-                <form onSubmit={handleSubmit(onSubmit)}>
+                <form onSubmit={handleSubmit(onSubmit)} noValidate>
                     <div className="mb-3">
                         <label htmlFor="email" className="form-label">
                             Correo Electrónico
@@ -73,15 +85,15 @@ const Login: React.FC = () => {
                         <input
                             id="email"
                             type="email"
-                            className={`form-control ${
-                                errors.email ? "is-invalid" : ""
-                            }`}
-                            {...register("email")}
+                            className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                            {...register('email')}
+                            onChange={(e) => {
+                            register('email').onChange(e);
+                            clearErrors('password');
+                            }}
                         />
                         {errors.email && (
-                            <div className="invalid-feedback">
-                                {errors.email.message}
-                            </div>
+                            <div className="invalid-feedback">{errors.email.message}</div>
                         )}
                     </div>
 
@@ -92,15 +104,15 @@ const Login: React.FC = () => {
                         <input
                             id="password"
                             type="password"
-                            className={`form-control ${
-                                errors.password ? "is-invalid" : ""
-                            }`}
-                            {...register("password")}
+                            className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                            {...register('password')}
+                            onChange={(e) => {
+                            register('password').onChange(e);
+                            clearErrors('password');
+                            }}
                         />
                         {errors.password && (
-                            <div className="invalid-feedback">
-                                {errors.password.message}
-                            </div>
+                            <div className="invalid-feedback">{errors.password.message}</div>
                         )}
                     </div>
 

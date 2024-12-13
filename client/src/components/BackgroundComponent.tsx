@@ -64,17 +64,19 @@ const BackgroundComponent: React.FC<BackgroundComponentProps> = ({ children }) =
                 backgroundImage: `url(${background})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
-                height: "100vh",
+                minHeight: "100vh",
                 margin: 0,
-                position: "absolute",
+                position: "fixed",
                 top: 0,
                 left: 0,
                 right: 0,
                 bottom: 0,
-                zIndex: -1, 
+                zIndex: -1,
             }}
         >
-            {children}
+            <div style={{ minHeight: "100vh", position: "relative" }}>
+                {children}
+            </div>
         </div>
     );
 };

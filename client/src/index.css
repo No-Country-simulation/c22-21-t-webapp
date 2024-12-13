@@ -25,7 +25,6 @@ a:hover {
 body {
   margin: 0;
   display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
@@ -65,4 +64,42 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+/* Auth container styles */
+.auth-container {
+  max-height: 100vh;
+  padding: 0.5rem;
+}
+
+/* Compact form styles */
+.compact-form {
+  margin-bottom: 0;
+}
+
+.compact-form .form-label {
+  font-size: 0.75rem;
+  margin-bottom: 0.125rem;
+}
+
+.compact-form .form-control-sm {
+  font-size: 0.813rem;
+  padding: 0.25rem 0.5rem;
+  height: calc(1.5em + 0.5rem + 2px);
+}
+
+.compact-form .invalid-feedback {
+  font-size: 0.688rem;
+  margin-top: 0.125rem;
+}
+
+.compact-form .form-text {
+  font-size: 0.688rem;
+  margin-top: 0.125rem;
+  margin-bottom: 0.25rem;
+}
+
+.compact-form .btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.813rem;
 }

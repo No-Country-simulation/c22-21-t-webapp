@@ -9,6 +9,7 @@ import { RegisterCredentials } from "../../components/types/auth";
 import { FaExclamationCircle } from "react-icons/fa";
 import "../../App.css";
 import { SEO } from "../../components/SEO/SEO";
+import { API_Url } from "../../components/types/authAPI";
 
 const registerSchema = z
     .object({
@@ -30,12 +31,12 @@ const registerSchema = z
             .string()
             .min(1, "El correo electrónico es obligatorio")
             .email("Por favor ingresa un correo electrónico válido"),
-        dni: z
+        phone: z
             .string()
-            .min(1, "El DNI es obligatorio")
-            .min(8, "El DNI debe tener al menos 8 caracteres")
-            .max(10, "El DNI no puede exceder los 10 caracteres")
-            .regex(/^\d+$/, "El DNI solo debe contener números"),
+            .min(1, "El telefono es obligatorio")
+            .min(8, "El telefono debe tener al menos 8 caracteres")
+            .max(10, "El telefono no puede exceder los 10 caracteres")
+            .regex(/^\d+$/, "El telefono solo debe contener números"),
         password: z
             .string()
             .min(1, "La contraseña es obligatoria")
@@ -46,12 +47,12 @@ const registerSchema = z
             )
             .regex(
                 /[a-z]/,
-                "La contraseñ debe contener al menos una letra minúscula"
+                "La contraseña debe contener al menos una letra minúscula"
             )
             .regex(/[0-9]/, "La contraseñ debe contener al menos un número")
             .regex(
                 /[@$!%*?&]/,
-                "La contraseñ debe contener al menos un caracter especial (@$!%*?&)"
+                "La contraseña debe contener al menos un caracter especial (@$!%*?&)"
             ),
         confirmPassword: z.string().min(1, "Por favor confirma tu contraseña"),
     })
@@ -73,19 +74,27 @@ const Register: React.FC = () => {
 
     const onSubmit = async (data: RegisterCredentials) => {
         try {
-            // TODO: Replace with API endpoint
-            const response = await fetch("/api/auth/register", {
+            const response = await fetch(`${API_Url}/auth/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
+                body: JSON.stringify({
+                    name: data.firstName + " " + data.lastName,
+                    email: data.email,
+                    //phone: data.phone,
+                    //password: data.password,
+                }),
             });
 
             if (!response.ok) throw new Error("El registro ha fallado");
 
-            toast.success(
-                "El registro ha sido exitoso! Por favor inicia sesión."
-            );
-            navigate("/login");
+            navigate('/verifyRegister', { 
+                state: {
+                  name:data.firstName + " " + data.lastName,   
+                  email:data.email,
+                  password:data.password,
+                  phone:data.phone,
+                } 
+              });
         } catch (error) {
             console.error(error);
             toast.error(
@@ -161,23 +170,23 @@ const Register: React.FC = () => {
                     </div>
 
                     <div className="col-12">
-                        <label htmlFor="dni" className="form-label small mb-1">
-                            DNI <span className="text-danger">*</span>
+                        <label htmlFor="phone" className="form-label small mb-1">
+                            Número de telefono <span className="text-danger">*</span>
                         </label>
                         <input
-                            id="dni"
+                            id="phone"
                             type="text"
                             className={`form-control form-control-sm ${
-                                touchedFields.dni && errors.dni
+                                touchedFields.phone && errors.phone
                                     ? "is-invalid"
                                     : ""
                             }`}
-                            {...register("dni")}
-                            placeholder="Ingresa tu DNI"
+                            {...register("phone")}
+                            placeholder="Ingresa el número de telefono"
                         />
-                        {touchedFields.dni && errors.dni && (
+                        {touchedFields.phone && errors.phone && (
                             <div className="invalid-feedback small">
-                                {errors.dni.message}
+                                {errors.phone.message}
                             </div>
                         )}
                     </div>
