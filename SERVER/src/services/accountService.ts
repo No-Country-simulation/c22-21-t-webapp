@@ -49,7 +49,23 @@ export const getAccountBalance = async (accountNumber: string) => {
   }
 
   return account.balance;
+  
 };
+
+export const getAccount = async (accountNumber: string) => {
+  const account = await Account.findOne({
+    where: { accountNumber, active: true }
+  });
+
+
+  if (!account) {
+    throw new Error("Cuenta no encontrada o inactiva.");
+  }
+
+  return account;
+  
+};
+
 
 interface TransactionHistoryParams {
   accountNumber: string;
