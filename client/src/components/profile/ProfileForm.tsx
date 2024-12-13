@@ -25,13 +25,13 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
   const { user } = useAuthStore();
   
   useEffect(() => {
-    if (user) {
+    if (user && !data.firstName && !data.lastName) {
       const [firstName, lastName] = user.name.split(' ');
       onChange('firstName', firstName || '');
       onChange('lastName', lastName || '');
       onChange('email', user.email);
     }
-  }, [user, onChange]);
+  }, [user, data.firstName, data.lastName, onChange]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.name, e.target.value);

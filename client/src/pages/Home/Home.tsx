@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { FaUser } from "react-icons/fa";
+import React, { useState, useEffect, useCallback } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FaUser, FaBell, FaSignOutAlt } from "react-icons/fa";
 import BackgroundComponent from "../../components/BackgroundComponent";
 import { SEO } from "../../components/SEO/SEO";
 import AvailableBalanceCard from "../../components/CardsHome/AvailableBalanceCard";
@@ -10,10 +10,7 @@ import TransactionsTable from "../../components/CardsHome/TransaccionsTable";
 import { useAuthStore } from "../../components/store/authStore";
 import { API_Url } from "../../components/types/authAPI";
 import "./Home.css";
-
-interface AccountData {
-    balance: string;
-}
+import TransferModal from "../../components/TransferModal/TransferModal";
 
 interface Transaction {
     id: number;
@@ -32,52 +29,56 @@ const Home: React.FC = () => {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const { user, token } = useAuthStore();
+    const { user, token, logout } = useAuthStore();
+    const navigate = useNavigate();
+    const [showNotifications, setShowNotifications] = useState(false);
+    const [showTransferModal, setShowTransferModal] = useState(false);
+
+    const formattedId = user?.id && user.id < 10 ? `0${user.id}` : user?.id;
+    const accountNumber = `10000${formattedId}`;
+
+    const fetchBalance = useCallback(async () => {
+        try {
+            const response = await fetch(`${API_Url}/accounts/${accountNumber}/balance`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (!response.ok) throw new Error('Failed to fetch balance');
+            const data = await response.json();
+            setAccountBalance(data.balance);
+        } catch (error) {
+            console.error('Error fetching balance:', error);
+        }
+    }, [token, accountNumber]);
+
+    const fetchTransactions = useCallback(async () => {
+        try {
+            const response = await fetch(`${API_Url}/accounts/${accountNumber}/transactions`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (!response.ok) throw new Error('Failed to fetch transactions');
+            const { data } = await response.json();
+            const transactionsArray = Array.isArray(data.transactions) ? data.transactions : [];
+            setTransactions(transactionsArray);
+            setFilteredTransactions(transactionsArray);
+        } catch (error) {
+            console.error('Error fetching transactions:', error);
+            setTransactions([]);
+            setFilteredTransactions([]);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [token, accountNumber]);
 
     useEffect(() => {
-        const fetchBalance = async () => {
-            try {
-                const response = await fetch(`${API_Url}/accounts/1000010/balance`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                if (!response.ok) throw new Error('Failed to fetch balance');
-                
-                const data = await response.json();
-                setAccountBalance(data.balance);
-            } catch (error) {
-                console.error('Error fetching balance:', error);
-            }
-        };
-
-        const fetchTransactions = async () => {
-            try {
-                const response = await fetch(`${API_Url}/accounts/1000010/transactions`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                if (!response.ok) throw new Error('Failed to fetch transactions');
-                
-                const { data } = await response.json();
-                const transactionsArray = Array.isArray(data.transactions) ? data.transactions : [];
-                setTransactions(transactionsArray);
-                setFilteredTransactions(transactionsArray);
-            } catch (error) {
-                console.error('Error fetching transactions:', error);
-                setTransactions([]);
-                setFilteredTransactions([]);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchBalance();
-        fetchTransactions();
-    }, [token]);
+        if (user?.id) {
+            fetchBalance();
+            fetchTransactions();
+        }
+    }, [token, user?.id, accountNumber, fetchBalance, fetchTransactions]);
 
     const handleSearch = (term: string) => {
         const filtered = transactions.filter(
@@ -109,6 +110,11 @@ const Home: React.FC = () => {
         setFilteredTransactions(sortedTransactions);
     };
 
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
     return (
         <>
             <SEO
@@ -121,10 +127,32 @@ const Home: React.FC = () => {
             />
             <BackgroundComponent>
                 <div className="home-container">
-                    <div className="profile-link">
-                        <Link to="/profile" className="profile-icon">
+                    <div className="header-actions">
+                        <div className="notifications">
+                            <button 
+                                className="icon-button"
+                                onClick={() => setShowNotifications(!showNotifications)}
+                            >
+                                <FaBell size={24} />
+                            </button>
+                            {showNotifications && (
+                                <div className="notifications-panel">
+                                    <h3>Notificaciones</h3>
+                                    <div className="notifications-list">
+                                        <p>No hay notificaciones nuevas</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        <Link to="/profile" className="icon-button">
                             <FaUser size={24} />
                         </Link>
+                        <button 
+                            className="icon-button logout-button"
+                            onClick={handleLogout}
+                        >
+                            <FaSignOutAlt size={24} />
+                        </button>
                     </div>
                     
                     <div className="user-welcome">
@@ -133,7 +161,15 @@ const Home: React.FC = () => {
 
                     <div className="dashboard-content">
                         <div className="balance-section">
-                            <AvailableBalanceCard balance={accountBalance} />
+                            <div className="balance-container">
+                                <AvailableBalanceCard balance={accountBalance} />
+                                <button 
+                                    className="transfer-button"
+                                    onClick={() => setShowTransferModal(true)}
+                                >
+                                    Nueva Transferencia
+                                </button>
+                            </div>
                             <ExpenseStatisticsCard transactions={transactions} />
                         </div>
 
@@ -149,6 +185,17 @@ const Home: React.FC = () => {
                         </div>
                     </div>
                 </div>
+
+                <TransferModal 
+                    isOpen={showTransferModal}
+                    onClose={() => setShowTransferModal(false)}
+                    accountNumber={accountNumber}
+                    onTransferComplete={() => {
+                        // Recargar el balance y las transacciones
+                        fetchBalance();
+                        fetchTransactions();
+                    }}
+                />
             </BackgroundComponent>
         </>
     );

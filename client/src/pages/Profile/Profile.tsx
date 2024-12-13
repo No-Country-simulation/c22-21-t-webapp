@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
 import toast from 'react-hot-toast';
@@ -78,12 +78,9 @@ export const Profile: React.FC = () => {
     fetchProfile();
   }, []);
 
-  const handleFieldChange = (name: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const handleChange = useCallback((name: string, value: string) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  }, []);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -168,7 +165,7 @@ export const Profile: React.FC = () => {
                     data={formData}
                     errors={errors}
                     isEditing={isEditing}
-                    onChange={handleFieldChange}
+                    onChange={handleChange}
                     onEdit={handleEdit}
                     onSave={handleSubmit}
                     onDiscard={handleDiscard}
