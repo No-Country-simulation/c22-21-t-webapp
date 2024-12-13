@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { API_Url } from '../../components/types/authAPI';
 import { useAuthStore } from '../../components/store/authStore';
 import './TransferModal.css';
+import SuccessModal from '../SuccessModal/SuccessModal';
 
 interface TransferModalProps {
     isOpen: boolean;
@@ -25,6 +26,7 @@ const TransferModal: React.FC<TransferModalProps> = ({ isOpen, onClose, accountN
         description: ''
     });
     const [showConfirmation, setShowConfirmation] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
     const { token } = useAuthStore();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -48,25 +50,24 @@ const TransferModal: React.FC<TransferModalProps> = ({ isOpen, onClose, accountN
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({
-                    fromAccountNumber: transferData.fromAccountNumber,
-                    toAccountNumber: transferData.toAccountNumber,
-                    amount: transferData.amount,
-                    description: transferData.description
-                })
+                body: JSON.stringify(transferData)
             });
 
             if (!response.ok) {
                 throw new Error('Error en la transferencia');
             }
 
-            alert('Transferencia realizada con éxito');
+            setShowSuccessModal(true);
             onTransferComplete();
-            onClose();
         } catch (error: Error | unknown) {
             alert(error instanceof Error ? error.message : 'Error al realizar la transferencia');
         }
         setShowConfirmation(false);
+    };
+
+    const handleSuccessClose = () => {
+        setShowSuccessModal(false);
+        onClose();
     };
 
     if (!isOpen) return null;
@@ -109,6 +110,8 @@ const TransferModal: React.FC<TransferModalProps> = ({ isOpen, onClose, accountN
                                     min="0"
                                     step="0.01"
                                     className="form-control"
+                                    onWheel={(e) => e.currentTarget.blur()}
+                                    style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }}
                                 />
                             </div>
                             <div className="form-group">
@@ -147,6 +150,10 @@ const TransferModal: React.FC<TransferModalProps> = ({ isOpen, onClose, accountN
                     </div>
                 )}
             </div>
+            <SuccessModal 
+                isOpen={showSuccessModal} 
+                onClose={handleSuccessClose}
+            />
         </div>
     );
 };

@@ -8,10 +8,23 @@ import { useAuthStore } from '../../components/store/authStore';
 import type { ProfileFormData } from '../../components/types/profile';
 import BackgroundComponent from '../../components/BackgroundComponent';
 import '../../pages/Profile/Profile.css';
+import { API_Url } from '../../components/types/authAPI';
+
+interface User {
+    id: number;
+    name: string;
+    email: string;
+    phone: string;
+    img: string | null;
+    active: boolean;
+    role: string;
+    createdAt: string;
+    updatedAt: string;
+}
 
 export const Profile: React.FC = () => {
   const navigate = useNavigate();
-  const { updateUser } = useAuthStore();
+  const { updateUser, user, token } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -124,6 +137,93 @@ export const Profile: React.FC = () => {
     }
   };
 
+  const handleImageChange = async (file: File | null) => {
+    if (file) {
+        try {
+            // Primero obtenemos todos los usuarios
+            const usersResponse = await fetch(`${API_Url}/users`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!usersResponse.ok) {
+                throw new Error('Error al obtener usuarios');
+            }
+
+            const users = await usersResponse.json();
+            // Encontrar el usuario actual
+            const currentUser = users.find((u: User) => u.id === user?.id);
+
+            if (!currentUser) {
+                throw new Error('Usuario no encontrado');
+            }
+
+            // Ahora actualizamos la imagen
+            const formData = new FormData();
+            formData.append('img', file);
+
+            const updateResponse = await fetch(`${API_Url}/users`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            if (!updateResponse.ok) {
+                throw new Error('Error al actualizar la imagen');
+            }
+
+            const updatedData = await updateResponse.json();
+            setImageUrl(updatedData.img);
+            toast.success('Imagen actualizada con éxito');
+        } catch (error) {
+            console.error('Error:', error);
+            toast.error('Error al actualizar la imagen');
+        }
+    } else {
+        try {
+            // Similar proceso para eliminar la imagen
+            const usersResponse = await fetch(`${API_Url}/users`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!usersResponse.ok) {
+                throw new Error('Error al obtener usuarios');
+            }
+
+            const users = await usersResponse.json();
+            const currentUser = users.find((u: User) => u.id === user?.id);
+
+            if (!currentUser) {
+                throw new Error('Usuario no encontrado');
+            }
+
+            const updateResponse = await fetch(`${API_Url}/users`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ img: null })
+            });
+
+            if (!updateResponse.ok) {
+                throw new Error('Error al eliminar la imagen');
+            }
+
+            setImageUrl(null);
+            toast.success('Imagen eliminada con éxito');
+        } catch (error) {
+            console.error('Error:', error);
+            toast.error('Error al eliminar la imagen');
+        }
+    }
+  };
+
   if (loading) {
     return (
       <div className="profile-container">
@@ -158,7 +258,7 @@ export const Profile: React.FC = () => {
                   
                   <ProfileImage
                     imageUrl={imageUrl}
-                    onImageChange={() => {}}
+                    onImageChange={handleImageChange}
                   />
 
                   <ProfileForm

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaUser, FaBell, FaSignOutAlt } from "react-icons/fa";
+import { FaUser, FaSignOutAlt } from "react-icons/fa";
 import BackgroundComponent from "../../components/BackgroundComponent";
 import { SEO } from "../../components/SEO/SEO";
 import AvailableBalanceCard from "../../components/CardsHome/AvailableBalanceCard";
@@ -31,7 +31,6 @@ const Home: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const { user, token, logout } = useAuthStore();
     const navigate = useNavigate();
-    const [showNotifications, setShowNotifications] = useState(false);
     const [showTransferModal, setShowTransferModal] = useState(false);
 
     const formattedId = user?.id && user.id < 10 ? `0${user.id}` : user?.id;
@@ -128,22 +127,6 @@ const Home: React.FC = () => {
             <BackgroundComponent>
                 <div className="home-container">
                     <div className="header-actions">
-                        <div className="notifications">
-                            <button 
-                                className="icon-button"
-                                onClick={() => setShowNotifications(!showNotifications)}
-                            >
-                                <FaBell size={24} />
-                            </button>
-                            {showNotifications && (
-                                <div className="notifications-panel">
-                                    <h3>Notificaciones</h3>
-                                    <div className="notifications-list">
-                                        <p>No hay notificaciones nuevas</p>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
                         <Link to="/profile" className="icon-button">
                             <FaUser size={24} />
                         </Link>
