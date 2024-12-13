@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { API_Url } from '../../components/types/authAPI';
 import { useAuthStore } from '../../components/store/authStore';
 import './TransferModal.css';
@@ -19,15 +19,24 @@ interface TransferData {
 }
 
 const TransferModal: React.FC<TransferModalProps> = ({ isOpen, onClose, accountNumber, onTransferComplete }) => {
-    const [transferData, setTransferData] = useState<TransferData>({
+    const initialTransferData = {
         fromAccountNumber: accountNumber,
         toAccountNumber: '',
         amount: 0,
         description: ''
-    });
+    };
+
+    const [transferData, setTransferData] = useState<TransferData>(initialTransferData);
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const { token } = useAuthStore();
+
+    useEffect(() => {
+        if (isOpen) {
+            setTransferData(initialTransferData);
+            setShowConfirmation(false);
+        }
+    }, [isOpen, accountNumber]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const value = e.target.name === 'amount' ? Number(e.target.value) : e.target.value;
