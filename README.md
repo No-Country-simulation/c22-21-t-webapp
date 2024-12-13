@@ -12,7 +12,6 @@ Este proyecto es el resultado del trabajo colaborativo de un equipo multidiscipl
 
 - **Yennifer Arce** - *QA Tester*
 - **Angela Quintero** - *QA Tester*
-- **Sol Gayarin** - *UX-UI*
 - **Violeta Hours** - *Front-End*
 - **Cesar Maldonado** - *Front-End*
 - **Luis Romero** - *Back-End*
@@ -20,7 +19,6 @@ Este proyecto es el resultado del trabajo colaborativo de un equipo multidiscipl
 - **Kevin Salinas** - *Back-End*
 - **Mateo Scienza** - *Back-End*
 - **Enrique Martinez** - *Back-End*
-- **Angel Serrato** - *Back-End*
 
 Si deseas ver más información sobre cada miembro del equipo o cómo contribuir, por favor visita nuestro [sitio web](https://www.google.com).
 
