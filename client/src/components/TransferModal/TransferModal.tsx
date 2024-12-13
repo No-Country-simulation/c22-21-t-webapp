@@ -27,6 +27,7 @@ const TransferModal: React.FC<TransferModalProps> = ({ isOpen, onClose, accountN
     });
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const { token } = useAuthStore();
 
     useEffect(() => {
@@ -56,6 +57,9 @@ const TransferModal: React.FC<TransferModalProps> = ({ isOpen, onClose, accountN
     };
 
     const handleConfirmTransfer = async () => {
+        if (isSubmitting) return;
+        
+        setIsSubmitting(true);
         try {
             const response = await fetch(`${API_Url}/accounts/transfer`, {
                 method: 'POST',
@@ -74,8 +78,10 @@ const TransferModal: React.FC<TransferModalProps> = ({ isOpen, onClose, accountN
             onTransferComplete();
         } catch (error: Error | unknown) {
             alert(error instanceof Error ? error.message : 'Error al realizar la transferencia');
+        } finally {
+            setIsSubmitting(false);
+            setShowConfirmation(false);
         }
-        setShowConfirmation(false);
     };
 
     const handleSuccessClose = () => {
@@ -153,11 +159,19 @@ const TransferModal: React.FC<TransferModalProps> = ({ isOpen, onClose, accountN
                         <p>Monto: ${transferData.amount}</p>
                         <p>Cuenta destino: {transferData.toAccountNumber}</p>
                         <div className="modal-buttons">
-                            <button onClick={() => setShowConfirmation(false)} className="btn-cancel">
+                            <button 
+                                onClick={() => setShowConfirmation(false)} 
+                                className="btn-cancel"
+                                disabled={isSubmitting}
+                            >
                                 Cancelar
                             </button>
-                            <button onClick={handleConfirmTransfer} className="btn-confirm">
-                                Confirmar
+                            <button 
+                                onClick={handleConfirmTransfer} 
+                                className="btn-confirm"
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? 'Procesando...' : 'Confirmar'}
                             </button>
                         </div>
                     </div>
