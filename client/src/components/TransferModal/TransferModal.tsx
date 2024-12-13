@@ -19,20 +19,24 @@ interface TransferData {
 }
 
 const TransferModal: React.FC<TransferModalProps> = ({ isOpen, onClose, accountNumber, onTransferComplete }) => {
-    const initialTransferData = {
+    const [transferData, setTransferData] = useState<TransferData>({
         fromAccountNumber: accountNumber,
         toAccountNumber: '',
         amount: 0,
         description: ''
-    };
-
-    const [transferData, setTransferData] = useState<TransferData>(initialTransferData);
+    });
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const { token } = useAuthStore();
 
     useEffect(() => {
         if (isOpen) {
+            const initialTransferData = {
+                fromAccountNumber: accountNumber,
+                toAccountNumber: '',
+                amount: 0,
+                description: ''
+            };
             setTransferData(initialTransferData);
             setShowConfirmation(false);
         }
