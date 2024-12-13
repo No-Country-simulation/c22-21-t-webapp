@@ -17,14 +17,14 @@ const registerSchema = z
             .string()
             .min(2, "Tu Nombre debe tener al menos 2 caracteres")
             .regex(
-                /^[a-zA-Z\s]*$/,
+                /^[a-zA-ZÀ-ÿ\s]+$/,
                 "Tu Nombre solo debe contener letras y espacios"
             ),
         lastName: z
             .string()
             .min(2, "Tu Apellido debe tener al menos 2 caracteres")
             .regex(
-                /^[a-zA-Z\s]*$/,
+                /^[a-zA-ZÀ-ÿ\s]+$/,
                 "Tu apellido solo debe contener letras y espacios"
             ),
         email: z
@@ -51,7 +51,7 @@ const registerSchema = z
             )
             .regex(/[0-9]/, "La contraseñ debe contener al menos un número")
             .regex(
-                /[@$!%*?&]/,
+                /[@$!%*?&_]/,
                 "La contraseña debe contener al menos un caracter especial (@$!%*?&)"
             ),
         confirmPassword: z.string().min(1, "Por favor confirma tu contraseña"),
