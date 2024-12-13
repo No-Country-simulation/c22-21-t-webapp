@@ -12,21 +12,21 @@ import { SEO } from "../../components/SEO/SEO";
 import { API_Url } from "../../components/types/authAPI";
 
 const registerSchema = z
-    .object({
-        firstName: z
-            .string()
-            .min(2, "Tu Nombre debe tener al menos 2 caracteres")
-            .regex(
-                /^[a-zA-Z\s]*$/,
-                "Tu Nombre solo debe contener letras y espacios"
-            ),
-        lastName: z
-            .string()
-            .min(2, "Tu Apellido debe tener al menos 2 caracteres")
-            .regex(
-                /^[a-zA-Z\s]*$/,
-                "Tu apellido solo debe contener letras y espacios"
-            ),
+  .object({
+    firstName: z
+      .string()
+      .min(2, "Tu Nombre debe tener al menos 2 caracteres")
+      .regex(
+        /^[a-zA-ZÀ-ÿ\s]+$/,
+        "Tu Nombre solo debe contener letras y espacios"
+      ),
+    lastName: z
+      .string()
+      .min(2, "Tu Apellido debe tener al menos 2 caracteres")
+      .regex(
+        /^[a-zA-ZÀ-ÿ\s]+$/,
+        "Tu Apellido solo debe contener letras y espacios"
+      ),
         email: z
             .string()
             .min(1, "El correo electrónico es obligatorio")
