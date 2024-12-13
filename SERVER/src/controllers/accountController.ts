@@ -4,10 +4,11 @@ import {
   registerAccount, 
   validateAccount, 
   getAccountBalance,
-  getTransactionHistory 
+  getTransactionHistory, 
+  getAccount
 } from "@services/accountService";
 
-export const registerAccountController = async (req: Request, res: Response) => {
+export const  registerAccountController = async (req: Request, res: Response) => {
   try {
     const { accountNumber, userId, balance } = req.body;
 
@@ -45,8 +46,8 @@ export const validateAccountController = async (req: Request, res: Response) => 
 
 export const getAccountBalanceController = async (req: Request, res: Response) => {
   try {
-    const { accountNumber } = req.params;
 
+    const { accountNumber } = req.params;
     const balance = await getAccountBalance(accountNumber);
 
     return res.status(200).json({
@@ -60,6 +61,28 @@ export const getAccountBalanceController = async (req: Request, res: Response) =
     return res.status(400).json({ message: "Error desconocido." });
   }
 };
+
+
+
+export const getAccountController = async (req: Request, res: Response) => {
+  try {
+
+    const { accountNumber } = req.params;
+    const balance = await getAccount(accountNumber);
+
+    return res.status(200).json({
+      message: "Cuenta obtenido con éxito.",
+      balance
+    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return res.status(400).json({ message: error.message });
+    }
+    return res.status(400).json({ message: "Error desconocido." });
+  }
+};
+
+
 
 export const getTransactionHistoryController = catchError(async (req: Request, res: Response) => {
   const { accountNumber } = req.params;

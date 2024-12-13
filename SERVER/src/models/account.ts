@@ -15,7 +15,7 @@ export interface AccountInput extends Optional<AccountAttributes, "id"> {}
 export class Account extends Model<AccountAttributes, AccountInput> implements AccountAttributes {
   public id!: number;
   public userId!: number;
-  public balance!: number;
+  declare balance: number; 
   public accountNumber!: string;
   public active!: boolean;
   public readonly createdAt!: Date;

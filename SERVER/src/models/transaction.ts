@@ -8,6 +8,7 @@ export interface TransactionAttributes {
   type: 'TRANSFER' | 'DEPOSIT' | 'WITHDRAWAL';
   status: 'COMPLETED' | 'FAILED' | 'PENDING';
   description?: string;
+  suspicious:boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -23,6 +24,7 @@ export class Transaction extends Model<TransactionAttributes, TransactionInput> 
   declare type: 'TRANSFER' | 'DEPOSIT' | 'WITHDRAWAL';
   declare status: 'COMPLETED' | 'FAILED' | 'PENDING';
   declare description?: string;
+  declare suspicious: boolean;
   declare readonly createdAt: Date;
   declare readonly updatedAt: Date;
 
@@ -57,6 +59,10 @@ export class Transaction extends Model<TransactionAttributes, TransactionInput> 
         description: {
           type: DataTypes.STRING,
           allowNull: true,
+        },
+        suspicious: {
+          type: DataTypes.BOOLEAN,
+          defaultValue: false,
         }
       },
       {
